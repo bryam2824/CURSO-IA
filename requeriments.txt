@@ -1,0 +1,200 @@
+# Documento de Requerimientos
+
+## Proyecto
+
+Sistema Inteligente de Apoyo para la Detección Temprana de Dengue Basado en Síntomas, Laboratorios, Factores Ambientales y Aprendizaje Automático.
+
+## Estado Actual del Proyecto
+
+El proyecto se encuentra actualmente en fase de desarrollo y prototipado. La arquitectura principal ya fue definida y varios módulos se encuentran implementados, aunque todavía se están realizando ajustes en los algoritmos de análisis, integración de modelos de inteligencia artificial y validación de resultados.
+
+Las probabilidades y clasificaciones generadas por el sistema no deben considerarse diagnósticos médicos definitivos. El objetivo actual es construir una plataforma de apoyo para la detección temprana del riesgo de dengue que pueda ser validada posteriormente con datos clínicos reales.
+
+## Objetivo General
+
+Desarrollar un sistema inteligente capaz de estimar el riesgo de dengue mediante la integración de:
+
+- Síntomas clínicos.
+- Resultados de laboratorio.
+- Signos de alarma.
+- Factores ambientales y climáticos.
+- Modelos de Machine Learning basados en XGBoost.
+
+## Objetivos Específicos
+
+- Analizar síntomas compatibles con dengue.
+- Analizar alteraciones hematológicas asociadas al dengue.
+- Detectar signos de alarma de gravedad.
+- Evaluar condiciones ambientales favorables para la presencia del vector Aedes aegypti.
+- Presentar por separado hallazgos individuales, alarmas y contexto ambiental.
+- Implementar modelos predictivos basados en inteligencia artificial.
+- Generar resultados interpretables para personal médico e investigadores.
+
+## Requerimientos Funcionales
+
+### RF\-01: Captura de Síntomas
+
+El sistema deberá permitir registrar:
+
+- Fiebre.
+- Cefalea.
+- Mialgia.
+- Artralgia.
+- Dolor retroocular.
+- Náuseas.
+- Vómitos.
+- Rash.
+- Sangrado.
+
+### RF\-02: Captura de Resultados de Laboratorio
+
+El sistema deberá analizar:
+
+- Plaquetas.
+- Leucocitos.
+- Hematocrito.
+- Hemoglobina.
+- Neutrófilos.
+
+### RF\-03: Captura de Signos de Alarma
+
+El sistema deberá registrar:
+
+- Hipotensión.
+- Somnolencia.
+- Sangrado.
+
+### RF\-04: Evaluación Ambiental
+
+El sistema deberá procesar variables climáticas y ambientales para estimar la idoneidad del entorno para la presencia del mosquito transmisor.
+
+### RF\-05: Motor de Análisis Clínico
+
+El sistema deberá consolidar los resultados obtenidos desde:
+
+- Módulo de síntomas.
+- Módulo de laboratorios.
+- Módulo de alarmas.
+
+### RF\-06: Modelo de Inteligencia Artificial Ambiental
+
+El módulo ambiental podrá utilizar un modelo XGBoost local para estimar la variable:
+
+- vector\_suitability.
+
+Este resultado describe el entorno y no se mezclará con la estimación individual.
+
+### RF\-07: Modelo de Fusión Inteligente
+
+El sistema solo podrá generar una probabilidad experimental del desenlace
+individual cuando se disponga de un modelo XGBoost entrenado con casos
+confirmados y aprobado para uso experimental. El entorno y las alarmas se
+presentarán por separado. Sin modelo publicado, se mostrará un índice
+descriptivo de síntomas, que no es una probabilidad.
+
+### RF\-08: Generación de Resultados
+
+El sistema deberá devolver:
+
+- Hallazgos observados y alarmas por separado.
+- Campos faltantes e inválidos y porcentaje de completitud.
+- Índice descriptivo no probabilístico si no hay un modelo local aprobado.
+- Salida de XGBoost identificada como experimental y no validada para uso clínico.
+
+## Requerimientos No Funcionales
+
+### RNF\-01
+
+El sistema deberá implementarse en Python.
+
+### RNF\-02
+
+La API deberá construirse mediante FastAPI.
+
+### RNF\-03
+
+El entrenamiento de modelos candidatos utilizará XGBoost. La evaluación en
+línea debe seguir funcionando sin XGBoost cuando no haya un modelo publicado.
+
+### RNF\-04
+
+La arquitectura deberá ser modular para facilitar futuras ampliaciones.
+
+### RNF\-05
+
+La plataforma deberá permitir integración futura con Telegram y servicios web.
+
+### RNF\-06
+
+El sistema deberá registrar resultados para futuras validaciones epidemiológicas.
+
+## Flujo API local actual
+
+`POST /evaluar` → `modelos/Analizador.py` → respuesta explicable con
+hallazgos, alarmas, campos faltantes y completitud. XGBoost se utiliza solo si
+hay un artefacto local aprobado para uso experimental; el entrenamiento es un
+proceso separado.
+
+## Componentes en Desarrollo
+
+Actualmente se encuentran en desarrollo:
+
+- Módulo consolidado de alarmas.
+- Validación de modelos con datos clínicos reales.
+- Sistema de explicabilidad del modelo.
+
+## Alcance de la Versión Actual
+
+La versión actual constituye un prototipo funcional destinado a pruebas, validación de algoritmos y evaluación de arquitectura. Los resultados obtenidos son experimentales y servirán como base para futuras versiones orientadas a apoyo clínico y vigilancia epidemiológica.
+
+## Implementación local disponible
+
+- `POST /evaluar` analiza datos suministrados en la solicitud y funciona sin
+  conexión a internet.
+- Los datos ausentes e inválidos se informan explícitamente y no se imputan.
+- `Proyecto_Analizis_Dengue/modelos/entrenamiento_xgboost.py` entrena
+  candidatos locales desde casos con etiqueta confirmada; el entrenamiento no
+  se activa durante una evaluación.
+- No se incluye dataset clínico confirmado ni modelo entrenado. El índice
+  descriptivo disponible no es una probabilidad clínica.
+
+## Requerimientos de aprendizaje y conocimiento
+
+### RF-09: Ingesta trazable de fuentes
+
+Cada conector deberá registrar fuente, fecha de consulta, periodo observado, ubicación, unidad, versión del esquema y resultado de validación. Las respuestas originales deberán poder distinguirse de los datos normalizados.
+
+### RF-10: Recuperación documental
+
+El sistema podrá indexar documentación autorizada y recuperar fragmentos pertinentes junto con referencias a su origen, versión y fecha. El contenido documental no se considerará etiqueta clínica ni actualizará automáticamente los parámetros del predictor.
+
+### RF-11: Entrenamiento supervisado candidato
+
+El sistema podrá entrenar un candidato únicamente con casos etiquetados mediante desenlaces definidos y confirmados. Los datos sin etiqueta verificada se excluyen del entrenamiento supervisado.
+
+### RF-12: Evaluación y publicación gobernadas
+
+Cada candidato deberá evaluarse con particiones que eviten fuga por paciente y tiempo, registrar métricas clínicas y de calibración, y requerir revisión humana antes de reemplazar una versión publicada. Se deberá conservar historial y capacidad de reversión.
+
+### RF-13: Separación de resultados
+
+El sistema deberá distinguir explícitamente entre idoneidad ambiental del vector, riesgo epidemiológico poblacional, probabilidad individual de infección y signos de alarma/gravedad. No se presentarán como una sola probabilidad intercambiable.
+
+### RNF-07: Privacidad y uso de fuentes
+
+No se enviarán datos personales identificables a APIs públicas ni a servicios de modelos externos. El uso de documentos y datasets deberá cumplir sus licencias, términos y requisitos de privacidad aplicables.
+
+### RNF-08: Incertidumbre y disponibilidad
+
+La falta o invalidez de una fuente deberá reportarse como dato no disponible; nunca se reemplazará silenciosamente por valores de ejemplo. Las salidas experimentales deberán identificarse como no validadas para uso clínico.
+
+### RNF-09: Auditoría reproducible
+
+Toda versión de datos, conocimiento indexado y modelo deberá tener procedencia y fecha, de modo que un resultado pueda relacionarse con sus entradas y versión de modelo.
+
+## Definición operativa de “autoaprendizaje”
+
+En este proyecto significa un ciclo controlado de incorporación y validación de información, recuperación de documentación vigente y entrenamiento periódico de candidatos con desenlaces confirmados. No significa que una respuesta previa del sistema se convierta en verdad ni que datos nuevos alteren automáticamente el predictor en producción.
+
+Las fuentes propuestas en `DATA_SOURCE.MD` son candidatas. La versión actual no cuenta todavía con conectores operativos, un corpus versionado ni un dataset clínico confirmado suficiente para afirmar que el sistema ya aprende de forma validada.
+

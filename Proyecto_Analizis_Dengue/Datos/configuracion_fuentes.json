@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "default": {
+    "clima": "nasa_power",
+    "epidemiologia": null
+  },
+  "municipios": {}
+}
